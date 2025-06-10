@@ -14,11 +14,20 @@
  * WC tested up to: 8.0
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ *
+ * @package WooCommerce_Installment_Purchase
  */
 
 if (!defined('ABSPATH')) {
     exit;
 }
+
+// Declare compatibility with High-Performance Order Storage (HPOS)
+add_action( 'before_woocommerce_init', function() {
+    if ( class_exists( 'Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
+        Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+    }
+} );
 
 if (!defined('WC_INSTALLMENT_PURCHASE_VERSION')) {
     define('WC_INSTALLMENT_PURCHASE_VERSION', '1.0.0');
@@ -34,6 +43,12 @@ if (!defined('WC_INSTALLMENT_PURCHASE_URL')) {
 
 // Autoloader
 require_once WC_INSTALLMENT_PURCHASE_PATH . 'vendor/autoload.php';
+
+// Include the Gateway class directly for early registration
+require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/Gateway/Gateway.php';
+
+// Register the payment gateway
+add_filter('woocommerce_payment_gateways', 'WooCommerce\\InstallmentPurchase\\Gateway\\Gateway::add_gateway');
 
 // Activation and deactivation hooks
 register_activation_hook(__FILE__, array('WooCommerce\InstallmentPurchase\Core\Activator', 'activate'));

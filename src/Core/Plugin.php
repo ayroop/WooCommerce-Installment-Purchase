@@ -23,13 +23,11 @@ class Plugin {
     }
 
     private function load_dependencies() {
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-activator.php';
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-deactivator.php';
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-loader.php';
-        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-admin.php';
-        require_once plugin_dir_path(dirname(__FILE__)) . 'frontend/class-frontend.php';
-        require_once plugin_dir_path(dirname(__FILE__)) . 'gateway/class-gateway.php';
-        require_once plugin_dir_path(dirname(__FILE__)) . 'api/class-api.php';
+        require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/Core/Loader.php';
+        require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/Admin/Admin.php';
+        require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/Frontend/Frontend.php';
+        require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/Gateway/Gateway.php';
+        require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/API/API.php';
 
         $this->loader = new Loader();
     }
@@ -53,9 +51,7 @@ class Plugin {
     }
 
     private function define_gateway_hooks() {
-        $gateway = new Gateway();
-
-        $this->loader->add_filter('woocommerce_payment_gateways', $gateway, 'add_gateway');
+        $this->loader->add_filter('woocommerce_payment_gateways', 'WooCommerce\\InstallmentPurchase\\Gateway\\Gateway', 'add_gateway');
     }
 
     private function define_api_hooks() {
