@@ -92,9 +92,9 @@ The plugin provides the following REST API endpoints:
 
 For support, please:
 
-1. Check the [documentation](https://your-domain.com/docs)
-2. Visit our [support forum](https://your-domain.com/support)
-3. Contact us at support@your-domain.com
+1. Check the [documentation](https://ayrop.com)
+2. Visit our [support forum](https://ayrop.com)
+3. Contact us at support@ayrop.com
 
 ## Contributing
 
@@ -111,5 +111,5 @@ This plugin is licensed under the GPL v2 or later.
 
 ## Credits
 
-- Developed by [Your Name](https://your-domain.com)
+- Developed by [Pooriya](https://ayrop.com)
 - Built with [WooCommerce](https://woocommerce.com) 
