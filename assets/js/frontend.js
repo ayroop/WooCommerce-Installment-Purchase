@@ -4,21 +4,83 @@
     const InstallmentPurchase = {
         init: function() {
             this.bindEvents();
+            // Trigger initial update if installment purchase is already selected on page load
+            this.handlePaymentMethodChange(); 
         },
 
         bindEvents: function() {
-            $('input[name="payment_method"]').on('change', this.handlePaymentMethodChange);
-            $('#installment-application').on('submit', this.handleApplicationSubmit);
+            $(document.body).on('change', 'input[name="payment_method"]', this.handlePaymentMethodChange.bind(this));
+            // Also bind to WooCommerce's update_checkout event for re-calculations
+            $(document.body).on('updated_checkout', this.handlePaymentMethodChange.bind(this));
+
+            $('#installment-application-submit-form').on('submit', this.handleApplicationSubmit.bind(this));
+
+            // Listen for changes in the selected installment months to update total summary
+            $(document.body).on('change', '#selected_installment_months', this.updateTotalSummary);
         },
 
         handlePaymentMethodChange: function() {
-            const method = $('input[name="payment_method"]:checked').val();
-            if (method === 'installment') {
-                $('.installment-details').show();
-                $('.installment-application-form').show();
+            const chosen_method = $('input[name="payment_method"]:checked').val();
+            if (chosen_method === 'installment_purchase') {
+                $('.installment-checkout-details').slideDown();
+                $('.installment-application-form').slideDown(); // Show the application form
+                this.updateInstallmentOptions();
             } else {
-                $('.installment-details').hide();
-                $('.installment-application-form').hide();
+                $('.installment-checkout-details').slideUp();
+                $('.installment-application-form').slideUp(); // Hide the application form
+            }
+        },
+
+        updateInstallmentOptions: function() {
+            const data = {
+                action: 'woocommerce_checkout_update_order_review',
+                security: installmentPurchase.nonce,
+                woocommerce_checkout_update_order_review: true // Necessary for WooCommerce AJAX
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: installmentPurchase.ajaxurl,
+                data: data,
+                dataType: 'json',
+                success: function(response) {
+                    if (response && response.options_html) {
+                        $('#selected_installment_months').html(response.options_html);
+                        // Update static text for down payment, remaining balance, service fee
+                        $('.installment-checkout-details p:nth-child(2)').text(
+                            installmentPurchase.i18n.downPayment + ': ' + response.down_payment_amount
+                        );
+                        $('.installment-checkout-details p:nth-child(3)').text(
+                            installmentPurchase.i18n.remainingBalance + ': ' + response.remaining_balance
+                        );
+                        $('.installment-checkout-details p:nth-child(4)').text(
+                            installmentPurchase.i18n.serviceFee + ': ' + response.service_fee_percentage + '%'
+                        );
+
+                        // Trigger change on select to update summary if an option was pre-selected
+                        $('#selected_installment_months').trigger('change');
+
+                    } else if (response && response.fragments) {
+                        // If WooCommerce sends fragments, apply them
+                        $.each(response.fragments, function(key, value) {
+                            $(key).replaceWith(value);
+                        });
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error("AJAX Error: " + textStatus, errorThrown);
+                    alert(installmentPurchase.i18n.error);
+                }
+            });
+        },
+
+        updateTotalSummary: function() {
+            const selectedOption = $(this).find('option:selected');
+            const monthlyText = selectedOption.text();
+            if (selectedOption.val() !== '') {
+                $('.installment-total-summary').text(monthlyText);
+            } else {
+                $('.installment-total-summary').empty();
             }
         },
 
@@ -29,6 +91,29 @@
             const $submitButton = $form.find('button[type="submit"]');
             const originalButtonText = $submitButton.text();
 
+            // Basic validation
+            const bankAccount = $('#bank_account').val();
+            const phoneNumber = $('#phone_number').val();
+            const emailAddress = $('#email_address').val();
+            const termsAccepted = $('#terms_and_conditions').is(':checked');
+
+            if (!bankAccount) {
+                alert(installmentPurchase.i18n.invalidBankAccount);
+                return;
+            }
+            if (!phoneNumber) {
+                alert(installmentPurchase.i18n.invalidPhone);
+                return;
+            }
+            if (!emailAddress || !/\S+@\S+\.\S+/.test(emailAddress)) {
+                alert(installmentPurchase.i18n.invalidEmail);
+                return;
+            }
+            if (!termsAccepted) {
+                alert(installmentPurchase.i18n.acceptTerms);
+                return;
+            }
+
             $submitButton.prop('disabled', true).text(installmentPurchase.i18n.processing);
 
             $.ajax({
@@ -37,14 +122,16 @@
                 data: {
                     action: 'submit_installment_application',
                     nonce: installmentPurchase.nonce,
-                    first_name: $('#first_name').val(),
-                    last_name: $('#last_name').val(),
-                    bank_account: $('#bank_account').val(),
-                    terms: $('input[name="terms"]').is(':checked')
+                    bank_account: bankAccount,
+                    phone_number: phoneNumber,
+                    email_address: emailAddress,
+                    terms_accepted: termsAccepted
                 },
                 success: function(response) {
                     if (response.success) {
-                        window.location.href = response.data.redirect_url;
+                        alert('Application submitted successfully!'); // Temporary message
+                        // Optionally redirect or update UI
+                        // window.location.href = response.data.redirect_url;
                     } else {
                         alert(response.data.message || installmentPurchase.i18n.error);
                     }

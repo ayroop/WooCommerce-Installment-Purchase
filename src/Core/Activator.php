@@ -7,6 +7,7 @@ class Activator {
         self::create_tables();
         self::create_pages();
         self::set_default_options();
+        self::register_custom_order_status();
     }
 
     private static function create_tables() {
@@ -57,5 +58,31 @@ class Activator {
                 update_option($key, $value);
             }
         }
+    }
+
+    private static function register_custom_order_status() {
+        add_action( 'init', function() {
+            register_post_status( 'wc-pending-down-payment', array(
+                'label'                     => _x( 'Pending Down Payment', 'Order status', 'installment-purchase' ),
+                'public'                    => true,
+                'exclude_from_search'       => false,
+                'show_in_admin_all_list'    => true,
+                'show_in_admin_status_list' => true,
+                'label_count'               => _n_noop( 'Pending Down Payment (%s)', 'Pending Down Payment (%s)', 'installment-purchase' ),
+            ) );
+        });
+
+        add_filter( 'wc_order_statuses', function( $order_statuses ) {
+            $new_order_statuses = array();
+
+            foreach ( $order_statuses as $key => $status ) {
+                $new_order_statuses[ $key ] = $status;
+                if ( 'wc-on-hold' === $key ) {
+                    $new_order_statuses[ 'wc-pending-down-payment' ] = _x( 'Pending Down Payment', 'Order status', 'installment-purchase' );
+                }
+            }
+
+            return $new_order_statuses;
+        } );
     }
 } 
