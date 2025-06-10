@@ -4,7 +4,6 @@ namespace WooCommerce\InstallmentPurchase\Core;
 
 use WooCommerce\InstallmentPurchase\Admin\Admin;
 use WooCommerce\InstallmentPurchase\Frontend\Frontend;
-use WooCommerce\InstallmentPurchase\Gateway\Gateway;
 use WooCommerce\InstallmentPurchase\API\API;
 
 class Plugin {
@@ -18,16 +17,13 @@ class Plugin {
         $this->load_dependencies();
         $this->define_admin_hooks();
         $this->define_frontend_hooks();
-        $this->define_gateway_hooks();
         $this->define_api_hooks();
     }
 
     private function load_dependencies() {
         require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/Core/Loader.php';
-        require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/Admin/Admin.php';
-        require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/Frontend/Frontend.php';
-        require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/Gateway/Gateway.php';
-        require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/API/API.php';
+        require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/Core/Activator.php';
+        require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/Core/Deactivator.php';
 
         $this->loader = new Loader();
     }
@@ -48,10 +44,6 @@ class Plugin {
         $this->loader->add_action('wp_enqueue_scripts', $frontend, 'enqueue_scripts');
         $this->loader->add_action('woocommerce_before_add_to_cart_button', $frontend, 'render_purchase_options');
         $this->loader->add_action('woocommerce_before_cart', $frontend, 'render_application_form');
-    }
-
-    private function define_gateway_hooks() {
-        $this->loader->add_filter('woocommerce_payment_gateways', 'WooCommerce\\InstallmentPurchase\\Gateway\\Gateway', 'add_gateway');
     }
 
     private function define_api_hooks() {

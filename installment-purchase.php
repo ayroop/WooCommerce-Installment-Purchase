@@ -44,12 +44,6 @@ if (!defined('WC_INSTALLMENT_PURCHASE_URL')) {
 // Autoloader
 require_once WC_INSTALLMENT_PURCHASE_PATH . 'vendor/autoload.php';
 
-// Include the Gateway class directly for early registration
-require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/Gateway/Gateway.php';
-
-// Register the payment gateway
-add_filter('woocommerce_payment_gateways', 'WooCommerce\\InstallmentPurchase\\Gateway\\Gateway::add_gateway');
-
 // Activation and deactivation hooks
 register_activation_hook(__FILE__, array('WooCommerce\InstallmentPurchase\Core\Activator', 'activate'));
 register_deactivation_hook(__FILE__, array('WooCommerce\InstallmentPurchase\Core\Deactivator', 'deactivate'));
@@ -72,6 +66,12 @@ function wc_installment_purchase_init() {
         });
         return;
     }
+
+    // Register the payment gateway here, after WooCommerce is loaded
+    add_filter('woocommerce_payment_gateways', function( $gateways ) {
+        $gateways[] = 'WooCommerce\\InstallmentPurchase\\Gateway\\Gateway';
+        return $gateways;
+    });
 
     $plugin = new WooCommerce\InstallmentPurchase\Core\Plugin();
     $plugin->run();
