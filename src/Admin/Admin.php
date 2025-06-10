@@ -3,7 +3,12 @@
 namespace WooCommerce\InstallmentPurchase\Admin;
 
 class Admin {
-    public function __construct() {
+    private $plugin_name;
+    private $version;
+
+    public function __construct($plugin_name, $version) {
+        $this->plugin_name = $plugin_name;
+        $this->version = $version;
         $this->init_hooks();
     }
 
@@ -15,33 +20,36 @@ class Admin {
         add_action('woocommerce_order_status_changed', array($this, 'handle_order_status_change'), 10, 3);
     }
 
+    public function enqueue_styles() {
+        wp_enqueue_style(
+            $this->plugin_name,
+            WC_INSTALLMENT_PURCHASE_URL . 'assets/css/admin.css',
+            array(),
+            $this->version,
+            'all'
+        );
+    }
+
     public function enqueue_scripts($hook) {
         if ('woocommerce_page_wc-installment-applications' !== $hook) {
             return;
         }
 
-        wp_enqueue_style(
-            'wc-installment-admin',
-            WC_INSTALLMENT_PURCHASE_URL . 'assets/css/admin.css',
-            array(),
-            WC_INSTALLMENT_PURCHASE_VERSION
-        );
-
         wp_enqueue_script(
-            'wc-installment-admin',
+            $this->plugin_name,
             WC_INSTALLMENT_PURCHASE_URL . 'assets/js/admin.js',
             array('jquery'),
-            WC_INSTALLMENT_PURCHASE_VERSION,
+            $this->version,
             true
         );
 
-        wp_localize_script('wc-installment-admin', 'wcInstallmentAdmin', array(
+        wp_localize_script($this->plugin_name, 'installmentPurchase', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('wc-installment-admin-nonce'),
+            'nonce' => wp_create_nonce('installment-purchase-nonce'),
             'i18n' => array(
                 'confirmApprove' => __('Are you sure you want to approve this application?', 'installment-purchase'),
                 'confirmDecline' => __('Are you sure you want to decline this application?', 'installment-purchase'),
-                'processing' => __('Processing...', 'installment-purchase'),
+                'processing' => __('Processing...', 'installment-purchase')
             )
         ));
     }
@@ -58,18 +66,16 @@ class Admin {
     }
 
     public function register_settings() {
-        register_setting('wc_installment_settings', 'wc_installment_min_down_payment');
-        register_setting('wc_installment_settings', 'wc_installment_service_fee');
-        register_setting('wc_installment_settings', 'wc_installment_max_months');
-        register_setting('wc_installment_settings', 'wc_installment_inquiry_fee');
+        register_setting('wc_installment_purchase', 'wc_installment_purchase_service_fee');
+        register_setting('wc_installment_purchase', 'wc_installment_purchase_max_months');
+        register_setting('wc_installment_purchase', 'wc_installment_purchase_inquiry_fee');
     }
 
     public function render_applications_page() {
         global $wpdb;
         
-        $applications = $wpdb->get_results(
-            "SELECT * FROM {$wpdb->prefix}installment_applications ORDER BY created_at DESC"
-        );
+        $table_name = $wpdb->prefix . 'wc_installment_applications';
+        $applications = $wpdb->get_results("SELECT * FROM {$table_name} ORDER BY created_at DESC");
         
         ?>
         <div class="wrap">
@@ -87,40 +93,50 @@ class Admin {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($applications as $application): ?>
+                    <?php if ($applications): ?>
+                        <?php foreach ($applications as $application): ?>
+                            <tr>
+                                <td><?php echo esc_html($application->id); ?></td>
+                                <td>
+                                    <?php 
+                                    $user = get_user_by('id', $application->user_id);
+                                    echo $user ? esc_html($user->display_name) : __('Unknown', 'installment-purchase');
+                                    ?>
+                                </td>
+                                <td><?php echo esc_html($application->bank_account); ?></td>
+                                <td><?php echo esc_html($application->status); ?></td>
+                                <td><?php echo esc_html($application->created_at); ?></td>
+                                <td>
+                                    <?php if ($application->status === 'pending'): ?>
+                                        <button class="button approve-application" data-id="<?php echo esc_attr($application->id); ?>">
+                                            <?php _e('Approve', 'installment-purchase'); ?>
+                                        </button>
+                                        <button class="button decline-application" data-id="<?php echo esc_attr($application->id); ?>">
+                                            <?php _e('Decline', 'installment-purchase'); ?>
+                                        </button>
+                                    <?php endif; ?>
+                                    <button class="button view-details" data-id="<?php echo esc_attr($application->id); ?>">
+                                        <?php _e('View Details', 'installment-purchase'); ?>
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
                         <tr>
-                            <td><?php echo esc_html($application->id); ?></td>
-                            <td>
-                                <?php
-                                $user = get_userdata($application->user_id);
-                                echo esc_html($user ? $user->display_name : __('Unknown', 'installment-purchase'));
-                                ?>
-                            </td>
-                            <td><?php echo esc_html($application->bank_account); ?></td>
-                            <td>
-                                <span class="status-<?php echo esc_attr($application->status); ?>">
-                                    <?php echo esc_html(ucfirst($application->status)); ?>
-                                </span>
-                            </td>
-                            <td><?php echo esc_html(date_i18n(get_option('date_format'), strtotime($application->created_at))); ?></td>
-                            <td>
-                                <?php if ($application->status === 'pending'): ?>
-                                    <button class="button approve-application" data-id="<?php echo esc_attr($application->id); ?>">
-                                        <?php _e('Approve', 'installment-purchase'); ?>
-                                    </button>
-                                    <button class="button decline-application" data-id="<?php echo esc_attr($application->id); ?>">
-                                        <?php _e('Decline', 'installment-purchase'); ?>
-                                    </button>
-                                <?php endif; ?>
-                                
-                                <a href="<?php echo esc_url(admin_url('admin.php?page=wc-installment-applications&action=view&id=' . $application->id)); ?>" class="button">
-                                    <?php _e('View Details', 'installment-purchase'); ?>
-                                </a>
-                            </td>
+                            <td colspan="6"><?php _e('No applications found.', 'installment-purchase'); ?></td>
                         </tr>
-                    <?php endforeach; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Application Details Modal -->
+        <div id="application-details-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2><?php _e('Installment Details', 'installment-purchase'); ?></h2>
+                <div id="application-details-content"></div>
+            </div>
         </div>
         <?php
     }

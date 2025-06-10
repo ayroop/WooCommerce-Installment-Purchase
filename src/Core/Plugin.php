@@ -2,6 +2,11 @@
 
 namespace WooCommerce\InstallmentPurchase\Core;
 
+use WooCommerce\InstallmentPurchase\Admin\Admin;
+use WooCommerce\InstallmentPurchase\Frontend\Frontend;
+use WooCommerce\InstallmentPurchase\Gateway\Gateway;
+use WooCommerce\InstallmentPurchase\API\API;
+
 class Plugin {
     protected $loader;
     protected $plugin_name;
@@ -12,41 +17,54 @@ class Plugin {
         $this->version = WC_INSTALLMENT_PURCHASE_VERSION;
         $this->load_dependencies();
         $this->define_admin_hooks();
-        $this->define_public_hooks();
+        $this->define_frontend_hooks();
+        $this->define_gateway_hooks();
+        $this->define_api_hooks();
     }
 
     private function load_dependencies() {
-        require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/Core/Loader.php';
-        require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/Admin/Admin.php';
-        require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/Frontend/Frontend.php';
-        require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/Gateway/Gateway.php';
-        require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/API/API.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-activator.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-deactivator.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-loader.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-admin.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'frontend/class-frontend.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'gateway/class-gateway.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'api/class-api.php';
 
         $this->loader = new Loader();
     }
 
     private function define_admin_hooks() {
-        $admin = new \WooCommerce\InstallmentPurchase\Admin\Admin($this->get_plugin_name(), $this->get_version());
-        
+        $admin = new Admin($this->plugin_name, $this->version);
+
         $this->loader->add_action('admin_enqueue_scripts', $admin, 'enqueue_styles');
         $this->loader->add_action('admin_enqueue_scripts', $admin, 'enqueue_scripts');
-        $this->loader->add_action('admin_menu', $admin, 'add_menu_page');
+        $this->loader->add_action('admin_menu', $admin, 'add_menu_pages');
         $this->loader->add_action('admin_init', $admin, 'register_settings');
     }
 
-    private function define_public_hooks() {
-        $frontend = new \WooCommerce\InstallmentPurchase\Frontend\Frontend($this->get_plugin_name(), $this->get_version());
-        
+    private function define_frontend_hooks() {
+        $frontend = new Frontend($this->plugin_name, $this->version);
+
         $this->loader->add_action('wp_enqueue_scripts', $frontend, 'enqueue_styles');
         $this->loader->add_action('wp_enqueue_scripts', $frontend, 'enqueue_scripts');
-        $this->loader->add_action('woocommerce_before_add_to_cart_button', $frontend, 'render_payment_options');
-        $this->loader->add_action('woocommerce_after_add_to_cart_button', $frontend, 'render_application_form');
-        
-        // Add installment purchase gateway
-        add_filter('woocommerce_payment_gateways', function($gateways) {
-            $gateways[] = 'WooCommerce\InstallmentPurchase\Gateway\Gateway';
-            return $gateways;
-        });
+        $this->loader->add_action('woocommerce_before_add_to_cart_button', $frontend, 'render_purchase_options');
+        $this->loader->add_action('woocommerce_before_cart', $frontend, 'render_application_form');
+    }
+
+    private function define_gateway_hooks() {
+        $gateway = new Gateway();
+
+        $this->loader->add_filter('woocommerce_payment_gateways', $gateway, 'add_gateway');
+    }
+
+    private function define_api_hooks() {
+        $api = new API();
+
+        $this->loader->add_action('wp_ajax_submit_installment_application', $api, 'handle_application_submission');
+        $this->loader->add_action('wp_ajax_nopriv_submit_installment_application', $api, 'handle_application_submission');
+        $this->loader->add_action('wp_ajax_approve_application', $api, 'handle_application_approval');
+        $this->loader->add_action('wp_ajax_decline_application', $api, 'handle_application_decline');
     }
 
     public function run() {
