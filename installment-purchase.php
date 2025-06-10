@@ -39,6 +39,12 @@ require_once WC_INSTALLMENT_PURCHASE_PATH . 'vendor/autoload.php';
 register_activation_hook(__FILE__, array('WooCommerce\InstallmentPurchase\Core\Activator', 'activate'));
 register_deactivation_hook(__FILE__, array('WooCommerce\InstallmentPurchase\Core\Deactivator', 'deactivate'));
 
+// Load text domain
+function wc_installment_purchase_load_textdomain() {
+    load_plugin_textdomain('installment-purchase', false, dirname(plugin_basename(__FILE__)) . '/languages');
+}
+add_action('init', 'wc_installment_purchase_load_textdomain');
+
 // Initialize plugin
 function wc_installment_purchase_init() {
     if (!class_exists('WooCommerce')) {

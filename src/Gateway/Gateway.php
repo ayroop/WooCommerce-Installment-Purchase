@@ -8,13 +8,16 @@ class Gateway extends \WC_Payment_Gateway {
         $this->icon = '';
         $this->has_fields = true;
         $this->method_title = __('Installment Purchase', 'installment-purchase');
-        $this->method_description = __('Enable customers to purchase products in installments', 'installment-purchase');
+        $this->method_description = __('Allow customers to purchase products in installments', 'installment-purchase');
 
-        // Load the settings
+        $this->supports = array(
+            'products',
+            'refunds'
+        );
+
         $this->init_form_fields();
         $this->init_settings();
 
-        // Define user set variables
         $this->title = $this->get_option('title');
         $this->description = $this->get_option('description');
         $this->enabled = $this->get_option('enabled');
@@ -83,27 +86,13 @@ class Gateway extends \WC_Payment_Gateway {
     public function process_payment($order_id) {
         $order = wc_get_order($order_id);
         
-        // Calculate down payment
-        $total = $order->get_total();
-        $down_payment = ($total * $this->min_down_payment) / 100;
-        
-        // Update order meta
-        $order->update_meta_data('_installment_down_payment', $down_payment);
-        $order->update_meta_data('_installment_remaining', $total - $down_payment);
-        $order->update_meta_data('_installment_months', $this->max_months);
-        $order->update_meta_data('_installment_service_fee', $this->service_fee);
-        
-        // Calculate monthly payment
-        $monthly_payment = ($total - $down_payment) * (1 + ($this->service_fee / 100)) / $this->max_months;
-        $order->update_meta_data('_installment_monthly_payment', $monthly_payment);
-        
-        // Create installment schedule
-        $this->create_installment_schedule($order);
-        
         // Mark as on-hold
-        $order->update_status('on-hold', __('Awaiting down payment', 'installment-purchase'));
+        $order->update_status('on-hold', __('Awaiting installment application approval', 'installment-purchase'));
         
-        // Empty cart
+        // Reduce stock levels
+        wc_reduce_stock_levels($order_id);
+        
+        // Remove cart
         WC()->cart->empty_cart();
         
         // Return thankyou redirect
@@ -113,30 +102,22 @@ class Gateway extends \WC_Payment_Gateway {
         );
     }
 
-    private function create_installment_schedule($order) {
-        global $wpdb;
+    public function process_refund($order_id, $amount = null, $reason = '') {
+        $order = wc_get_order($order_id);
         
-        $remaining = $order->get_meta('_installment_remaining');
-        $monthly_payment = $order->get_meta('_installment_monthly_payment');
-        $months = $order->get_meta('_installment_months');
-        
-        $due_date = new \DateTime();
-        $due_date->modify('+1 month');
-        
-        for ($i = 0; $i < $months; $i++) {
-            $wpdb->insert(
-                $wpdb->prefix . 'installment_schedules',
-                array(
-                    'application_id' => $order->get_id(),
-                    'amount' => $monthly_payment,
-                    'due_date' => $due_date->format('Y-m-d'),
-                    'status' => 'pending'
-                ),
-                array('%d', '%f', '%s', '%s')
-            );
-            
-            $due_date->modify('+1 month');
+        if (!$order) {
+            return false;
         }
+
+        // Check if the order is an installment purchase
+        if ($order->get_payment_method() !== $this->id) {
+            return false;
+        }
+
+        // Process refund logic here
+        // This is a placeholder - implement your refund logic
+        
+        return true;
     }
 
     public function check_installment_response() {
@@ -157,5 +138,10 @@ class Gateway extends \WC_Payment_Gateway {
         }
         
         wp_die(__('Invalid request', 'installment-purchase'), __('Payment Error', 'installment-purchase'), array('response' => 400));
+    }
+
+    public static function add_gateway($methods) {
+        $methods[] = __CLASS__;
+        return $methods;
     }
 } 
