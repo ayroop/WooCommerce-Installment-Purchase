@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: WooCommerce Installment Purchase
- * Plugin URI: https://your-domain.com/installment-purchase
+ * Plugin URI: https://ayrop.com/installment-purchase
  * Description: Enable installment purchases for WooCommerce products
  * Version: 1.0.0
- * Author: Your Name
- * Author URI: https://your-domain.com
+ * Author: Pooriya
+ * Author URI: https://ayrop.com
  * Text Domain: installment-purchase
  * Domain Path: /languages
  * Requires at least: 5.8
