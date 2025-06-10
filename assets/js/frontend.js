@@ -33,9 +33,8 @@
 
         updateInstallmentOptions: function() {
             const data = {
-                action: 'woocommerce_checkout_update_order_review',
-                security: installmentPurchase.nonce,
-                woocommerce_checkout_update_order_review: true // Necessary for WooCommerce AJAX
+                action: 'wc_installment_purchase_calculate_installments',
+                security: installmentPurchase.nonce
             };
 
             $.ajax({
@@ -44,7 +43,7 @@
                 data: data,
                 dataType: 'json',
                 success: function(response) {
-                    if (response && response.options_html) {
+                    if (response.success && response.options_html) {
                         $('#selected_installment_months').html(response.options_html);
                         // Update static text for down payment, remaining balance, service fee
                         $('.installment-checkout-details p:nth-child(2)').text(
@@ -60,11 +59,10 @@
                         // Trigger change on select to update summary if an option was pre-selected
                         $('#selected_installment_months').trigger('change');
 
-                    } else if (response && response.fragments) {
-                        // If WooCommerce sends fragments, apply them
-                        $.each(response.fragments, function(key, value) {
-                            $(key).replaceWith(value);
-                        });
+                    } else if (response.data && response.data.message) {
+                        alert(response.data.message);
+                    } else {
+                        alert(installmentPurchase.i18n.error);
                     }
                 },
                 error: function(jqXHR, textStatus, errorThrown) {

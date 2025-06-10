@@ -20,7 +20,10 @@ class Frontend {
 
         // New hook for displaying installment details on checkout
         add_action('woocommerce_review_order_after_payment_method_options', array($this, 'render_installment_details_on_checkout'));
-        add_action('woocommerce_checkout_update_order_review', array($this, 'ajax_calculate_installments'));
+
+        // Custom AJAX actions for installment calculation
+        add_action( 'wp_ajax_wc_installment_purchase_calculate_installments', array( $this, 'ajax_calculate_installments' ) );
+        add_action( 'wp_ajax_nopriv_wc_installment_purchase_calculate_installments', array( $this, 'ajax_calculate_installments' ) );
     }
 
     public function enqueue_styles() {
@@ -203,8 +206,10 @@ class Frontend {
     }
     
     public function ajax_calculate_installments() {
-        if ( ! defined( 'WOOCOMMERCE_CHECKOUT' ) || ! \WC_AJAX || ! isset( $_POST['woocommerce_checkout_update_order_review'] ) ) {
-            return;
+        // We are no longer relying on WooCommerce_CHECKOUT or WC_AJAX as the primary check here.
+        // This method will now be called via our custom AJAX action.
+        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'installment-purchase-nonce' ) ) {
+            wp_send_json_error( array( 'message' => __('Security check failed.', 'installment-purchase') ) );
         }
 
         if ( 'installment_purchase' === WC()->session->get( 'chosen_payment_method' ) ) {
@@ -230,6 +235,7 @@ class Frontend {
                 'success' => true
             ) );
         } else {
+            // If our gateway is not selected, just send success and let frontend handle visibility
             wp_send_json_success();
         }
     }
