@@ -1,115 +1,152 @@
 # WooCommerce Installment Purchase
 
-A WordPress plugin that enables installment purchases for WooCommerce products.
+A WordPress plugin that enables installment purchases for WooCommerce products with smart calculation and verification system.
 
 ## Features
 
-- Add "Cash" or "Installment" payment options on product pages
-- Customizable down payment percentage
-- Configurable service fee
-- Flexible installment period (up to 6 months)
-- Application management system
-- Email notifications
-- Admin dashboard for managing applications
-- REST API endpoints for integration
-- Fully translatable
+- Two payment options on product pages:
+  - Cash Payment
+  - Installment Payment
+- Smart calculation of installment purchase:
+  - Minimum 50% down payment
+  - Service fee on remaining balance
+  - Up to 6 months installment period
+- Application process:
+  - Personal information collection
+  - Bank account verification
+  - Terms and conditions agreement
+  - Inquiry fee payment
+- Admin features:
+  - Application management
+  - Status updates
+  - Email notifications
+  - Check registration
+- Multi-language support (including Persian)
 
 ## Requirements
 
 - WordPress 5.8 or higher
-- WooCommerce 5.0 or higher
 - PHP 7.4 or higher
+- WooCommerce 5.0 or higher
+- Composer for dependency management
 
 ## Installation
 
-1. Download the plugin zip file
-2. Go to WordPress admin panel > Plugins > Add New
-3. Click "Upload Plugin" and select the zip file
-4. Activate the plugin
-5. Go to WooCommerce > Settings > Payments
-6. Enable and configure the "Installment Purchase" payment method
+1. Download the plugin from GitHub
+2. Upload the plugin files to `/wp-content/plugins/woocommerce-installment-purchase`
+3. Install dependencies:
+   ```bash
+   cd wp-content/plugins/woocommerce-installment-purchase
+   composer install
+   ```
+4. Activate the plugin through the WordPress admin panel
+5. Configure the plugin settings in WooCommerce > Settings > Payments
 
 ## Configuration
 
-### General Settings
-
 1. Go to WooCommerce > Settings > Payments
-2. Click on "Installment Purchase" to configure:
-   - Enable/Disable the payment method
-   - Set minimum down payment percentage
-   - Configure service fee
-   - Set maximum number of months
-   - Set inquiry fee amount
-
-### Application Page
-
-1. Go to Pages > Add New
-2. Add the shortcode `[installment_application]` to the page content
-3. Publish the page
-4. Go to WooCommerce > Settings > Installment Purchase
-5. Set the Application Page ID
+2. Enable "Installment Purchase"
+3. Configure the following settings:
+   - Service Fee (%)
+   - Maximum Months
+   - Inquiry Fee
+   - Email Templates
+   - Terms and Conditions
 
 ## Usage
 
 ### For Customers
 
-1. Browse products on your store
-2. On the product page, select "Installment" payment option
-3. Click "Add to Cart"
-4. Fill out the application form
-5. Submit the application
-6. Wait for approval
-7. Once approved, complete the down payment
-8. Receive the product
-9. Pay monthly installments
+1. Visit a product page
+2. Choose between Cash or Installment payment
+3. If selecting Installment:
+   - Fill out the application form
+   - Pay the inquiry fee
+   - Wait for approval
+   - Complete the down payment
+   - Submit checks for remaining installments
 
 ### For Administrators
 
-1. Go to WooCommerce > Installment Applications
-2. View all applications
-3. Approve or decline applications
-4. Monitor payment status
-5. Send notifications to customers
+1. Access applications in WooCommerce > Installment Applications
+2. Review and process applications
+3. Update application status
+4. Register checks
+5. Monitor installment payments
 
-## Translation
+## Development
 
-The plugin is fully translatable. To translate:
+### Project Structure
 
-1. Use a translation plugin like Loco Translate or WPML
-2. Create a new translation for the text domain 'installment-purchase'
-3. Translate all strings
-4. Save the translation files in the 'languages' directory
+```
+woocommerce-installment-purchase/
+├── assets/
+│   ├── css/
+│   │   ├── admin.css
+│   │   └── frontend.css
+│   └── js/
+│       ├── admin.js
+│       └── frontend.js
+├── languages/
+│   ├── installment-purchase-fa_IR.po
+│   └── installment-purchase.pot
+├── src/
+│   ├── Admin/
+│   │   └── Admin.php
+│   ├── API/
+│   │   └── API.php
+│   ├── Core/
+│   │   ├── Activator.php
+│   │   ├── Deactivator.php
+│   │   ├── Loader.php
+│   │   └── Plugin.php
+│   ├── Frontend/
+│   │   └── Frontend.php
+│   └── Gateway/
+│       └── Gateway.php
+├── composer.json
+├── installment-purchase.php
+└── README.md
+```
 
-## API Endpoints
+### Building from Source
 
-The plugin provides the following REST API endpoints:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/ayroop/WooCommerce-Installment-Purchase.git
+   ```
 
-- `GET /wp-json/wc-installment/v1/applications` - List all applications
-- `GET /wp-json/wc-installment/v1/applications/{id}` - Get application details
-- `POST /wp-json/wc-installment/v1/applications/{id}/status` - Update application status
+2. Install dependencies:
+   ```bash
+   composer install
+   ```
+
+3. Build assets (if needed):
+   ```bash
+   npm install
+   npm run build
+   ```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the GPL v2 or later - see the [LICENSE](LICENSE) file for details.
 
 ## Support
 
 For support, please:
-
-1. Check the [documentation](https://ayrop.com)
-2. Visit our [support forum](https://ayrop.com)
-3. Contact us at support@ayrop.com
-
-## Contributing
-
-We welcome contributions! Please:
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-## License
-
-This plugin is licensed under the GPL v2 or later.
+1. Check the [documentation](https://github.com/ayroop/WooCommerce-Installment-Purchase/wiki)
+2. Open an [issue](https://github.com/ayroop/WooCommerce-Installment-Purchase/issues)
+3. Contact the maintainer
 
 ## Credits
 
-- Developed by [Pooriya](https://ayrop.com)
-- Built with [WooCommerce](https://woocommerce.com) 
+- Developed by [Ayroop](https://github.com/ayroop)
+- Built with [WooCommerce](https://woocommerce.com/) 

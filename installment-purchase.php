@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: WooCommerce Installment Purchase
- * Plugin URI: https://ayrop.com/installment-purchase
- * Description: Enable installment purchases for WooCommerce products
+ * Plugin URI: https://github.com/ayroop/WooCommerce-Installment-Purchase
+ * Description: Enable installment purchases for WooCommerce products with smart calculation and verification system.
  * Version: 1.0.0
- * Author: Pooriya
- * Author URI: https://ayrop.com
+ * Author: Ayroop
+ * Author URI: https://github.com/ayroop
  * Text Domain: installment-purchase
  * Domain Path: /languages
  * Requires at least: 5.8
@@ -27,12 +27,10 @@ define('WC_INSTALLMENT_PURCHASE_PATH', plugin_dir_path(__FILE__));
 define('WC_INSTALLMENT_PURCHASE_URL', plugin_dir_url(__FILE__));
 
 // Autoloader
-if (file_exists(WC_INSTALLMENT_PURCHASE_PATH . 'vendor/autoload.php')) {
-    require_once WC_INSTALLMENT_PURCHASE_PATH . 'vendor/autoload.php';
-}
+require_once WC_INSTALLMENT_PURCHASE_PATH . 'vendor/autoload.php';
 
-// Initialize the plugin
-function wc_installment_purchase_init() {
+// Check if WooCommerce is active
+function wc_installment_purchase_check_woocommerce() {
     if (!class_exists('WooCommerce')) {
         add_action('admin_notices', function() {
             ?>
@@ -41,6 +39,14 @@ function wc_installment_purchase_init() {
             </div>
             <?php
         });
+        return false;
+    }
+    return true;
+}
+
+// Initialize the plugin
+function wc_installment_purchase_init() {
+    if (!wc_installment_purchase_check_woocommerce()) {
         return;
     }
 
@@ -48,19 +54,25 @@ function wc_installment_purchase_init() {
     load_plugin_textdomain('installment-purchase', false, dirname(plugin_basename(__FILE__)) . '/languages');
 
     // Initialize plugin
-    \WooCommerce\InstallmentPurchase\Core\Plugin::instance();
+    $plugin = new \WooCommerce\InstallmentPurchase\Core\Plugin();
+    $plugin->run();
 }
-add_action('plugins_loaded', 'wc_installment_purchase_init');
 
-// Activation hook
+// Register activation and deactivation hooks
 register_activation_hook(__FILE__, function() {
-    // Create database tables
-    require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/Core/Activator.php';
-    \WooCommerce\InstallmentPurchase\Core\Activator::activate();
+    if (!wc_installment_purchase_check_woocommerce()) {
+        deactivate_plugins(plugin_basename(__FILE__));
+        wp_die(__('WooCommerce Installment Purchase requires WooCommerce to be installed and active.', 'installment-purchase'));
+    }
+    
+    $activator = new \WooCommerce\InstallmentPurchase\Core\Activator();
+    $activator->activate();
 });
 
-// Deactivation hook
 register_deactivation_hook(__FILE__, function() {
-    require_once WC_INSTALLMENT_PURCHASE_PATH . 'src/Core/Deactivator.php';
-    \WooCommerce\InstallmentPurchase\Core\Deactivator::deactivate();
-}); 
+    $deactivator = new \WooCommerce\InstallmentPurchase\Core\Deactivator();
+    $deactivator->deactivate();
+});
+
+// Hook into WordPress
+add_action('plugins_loaded', 'wc_installment_purchase_init'); 

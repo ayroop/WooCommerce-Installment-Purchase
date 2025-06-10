@@ -3,46 +3,52 @@
 namespace WooCommerce\InstallmentPurchase\Frontend;
 
 class Frontend {
-    public function __construct() {
+    private $plugin_name;
+    private $version;
+
+    public function __construct($plugin_name, $version) {
+        $this->plugin_name = $plugin_name;
+        $this->version = $version;
         $this->init_hooks();
     }
 
     private function init_hooks() {
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
-        add_action('woocommerce_before_add_to_cart_button', array($this, 'render_purchase_options'));
+        add_action('woocommerce_before_add_to_cart_button', array($this, 'render_payment_options'));
         add_action('template_redirect', array($this, 'handle_installment_selection'));
         add_shortcode('installment_application', array($this, 'render_application_form'));
     }
 
-    public function enqueue_scripts() {
-        if (is_product()) {
-            wp_enqueue_style(
-                'wc-installment-purchase',
-                WC_INSTALLMENT_PURCHASE_URL . 'assets/css/frontend.css',
-                array(),
-                WC_INSTALLMENT_PURCHASE_VERSION
-            );
-
-            wp_enqueue_script(
-                'wc-installment-purchase',
-                WC_INSTALLMENT_PURCHASE_URL . 'assets/js/frontend.js',
-                array('jquery'),
-                WC_INSTALLMENT_PURCHASE_VERSION,
-                true
-            );
-
-            wp_localize_script('wc-installment-purchase', 'wcInstallmentPurchase', array(
-                'ajaxurl' => admin_url('admin-ajax.php'),
-                'nonce' => wp_create_nonce('wc-installment-purchase-nonce'),
-                'i18n' => array(
-                    'selectPaymentMethod' => __('Please select a payment method', 'installment-purchase'),
-                    'processing' => __('Processing...', 'installment-purchase'),
-                )
-            ));
-        }
+    public function enqueue_styles() {
+        wp_enqueue_style(
+            $this->plugin_name,
+            WC_INSTALLMENT_PURCHASE_URL . 'assets/css/frontend.css',
+            array(),
+            $this->version,
+            'all'
+        );
     }
 
-    public function render_purchase_options() {
+    public function enqueue_scripts() {
+        wp_enqueue_script(
+            $this->plugin_name,
+            WC_INSTALLMENT_PURCHASE_URL . 'assets/js/frontend.js',
+            array('jquery'),
+            $this->version,
+            true
+        );
+
+        wp_localize_script($this->plugin_name, 'installmentPurchase', array(
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('installment-purchase-nonce'),
+            'i18n' => array(
+                'processing' => __('Processing...', 'installment-purchase'),
+                'error' => __('An error occurred. Please try again.', 'installment-purchase')
+            )
+        ));
+    }
+
+    public function render_payment_options() {
         global $product;
         
         if (!$product || !$product->is_purchasable()) {
@@ -50,34 +56,32 @@ class Frontend {
         }
 
         $price = $product->get_price();
-        $min_down_payment = get_option('wc_installment_min_down_payment', 50);
-        $service_fee = get_option('wc_installment_service_fee', 5);
-        $max_months = get_option('wc_installment_max_months', 6);
-
-        $down_payment = ($price * $min_down_payment) / 100;
-        $remaining = $price - $down_payment;
-        $monthly_payment = ($remaining * (1 + ($service_fee / 100))) / $max_months;
+        $min_down_payment = $price * 0.5; // 50% minimum down payment
+        $service_fee = get_option('wc_installment_purchase_service_fee', 5); // Default 5%
+        $max_months = get_option('wc_installment_purchase_max_months', 6); // Default 6 months
 
         ?>
-        <div class="wc-installment-purchase-options">
-            <h4><?php _e('Payment Method', 'installment-purchase'); ?></h4>
+        <div class="installment-purchase-options">
+            <h3><?php _e('Payment Method', 'installment-purchase'); ?></h3>
             
             <div class="payment-options">
                 <label>
                     <input type="radio" name="payment_method" value="cash" checked>
                     <?php _e('Cash Payment', 'installment-purchase'); ?>
-                    <span class="price"><?php echo wc_price($price); ?></span>
                 </label>
-
+                
                 <label>
                     <input type="radio" name="payment_method" value="installment">
                     <?php _e('Installment Payment', 'installment-purchase'); ?>
-                    <div class="installment-details">
-                        <p><?php printf(__('Down Payment: %s', 'installment-purchase'), wc_price($down_payment)); ?></p>
-                        <p><?php printf(__('Monthly Payment: %s x %d months', 'installment-purchase'), wc_price($monthly_payment), $max_months); ?></p>
-                        <p><?php printf(__('Service Fee: %s%%', 'installment-purchase'), $service_fee); ?></p>
-                    </div>
                 </label>
+            </div>
+
+            <div class="installment-details" style="display: none;">
+                <p><?php printf(__('Down Payment: %s', 'installment-purchase'), wc_price($min_down_payment)); ?></p>
+                <p><?php printf(__('Monthly Payment: %s x %d months', 'installment-purchase'), 
+                    wc_price(($price - $min_down_payment) * (1 + $service_fee/100) / $max_months), 
+                    $max_months); ?></p>
+                <p><?php printf(__('Service Fee: %s%%', 'installment-purchase'), $service_fee); ?></p>
             </div>
         </div>
         <?php
@@ -93,51 +97,48 @@ class Frontend {
         }
     }
 
-    public function render_application_form($atts) {
+    public function render_application_form() {
         if (!is_user_logged_in()) {
-            return '<p>' . __('Please log in to apply for installment purchase.', 'installment-purchase') . '</p>';
+            echo '<p class="installment-login-notice">' . 
+                __('Please log in to apply for installment purchase.', 'installment-purchase') . 
+                '</p>';
+            return;
         }
 
-        $product_id = isset($_GET['product_id']) ? intval($_GET['product_id']) : 0;
-        if (!$product_id || !wc_get_product($product_id)) {
-            return '<p>' . __('Invalid product selected.', 'installment-purchase') . '</p>';
-        }
-
-        ob_start();
         ?>
-        <form id="installment-application-form" class="wc-installment-application-form">
-            <?php wp_nonce_field('wc-installment-application', 'wc_installment_nonce'); ?>
-            <input type="hidden" name="product_id" value="<?php echo esc_attr($product_id); ?>">
+        <div class="installment-application-form" style="display: none;">
+            <h3><?php _e('Installment Application', 'installment-purchase'); ?></h3>
+            
+            <form id="installment-application">
+                <div class="form-row">
+                    <label for="first_name"><?php _e('First Name', 'installment-purchase'); ?></label>
+                    <input type="text" id="first_name" name="first_name" required>
+                </div>
 
-            <div class="form-row">
-                <label for="first_name"><?php _e('First Name', 'installment-purchase'); ?> *</label>
-                <input type="text" id="first_name" name="first_name" required>
-            </div>
+                <div class="form-row">
+                    <label for="last_name"><?php _e('Last Name', 'installment-purchase'); ?></label>
+                    <input type="text" id="last_name" name="last_name" required>
+                </div>
 
-            <div class="form-row">
-                <label for="last_name"><?php _e('Last Name', 'installment-purchase'); ?> *</label>
-                <input type="text" id="last_name" name="last_name" required>
-            </div>
+                <div class="form-row">
+                    <label for="bank_account"><?php _e('Bank Account Number', 'installment-purchase'); ?></label>
+                    <input type="text" id="bank_account" name="bank_account" required>
+                </div>
 
-            <div class="form-row">
-                <label for="bank_account"><?php _e('Bank Account Number', 'installment-purchase'); ?> *</label>
-                <input type="text" id="bank_account" name="bank_account" required>
-            </div>
+                <div class="form-row">
+                    <label>
+                        <input type="checkbox" name="terms" required>
+                        <?php _e('I agree to the terms and conditions', 'installment-purchase'); ?>
+                    </label>
+                </div>
 
-            <div class="form-row">
-                <label>
-                    <input type="checkbox" name="terms" required>
-                    <?php _e('I agree to the terms and conditions', 'installment-purchase'); ?> *
-                </label>
-            </div>
-
-            <div class="form-row">
-                <button type="submit" class="button alt">
-                    <?php _e('Submit Application', 'installment-purchase'); ?>
-                </button>
-            </div>
-        </form>
+                <div class="form-row">
+                    <button type="submit" class="button alt">
+                        <?php _e('Submit Application', 'installment-purchase'); ?>
+                    </button>
+                </div>
+            </form>
+        </div>
         <?php
-        return ob_get_clean();
     }
 } 
