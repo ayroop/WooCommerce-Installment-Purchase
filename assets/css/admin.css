@@ -1,0 +1,94 @@
+.wc-installment-details {
+    margin: 20px 0;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.wc-installment-details h3 {
+    margin: 0 0 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.wc-installment-details p {
+    margin: 10px 0;
+}
+
+.wc-installment-details strong {
+    display: inline-block;
+    width: 150px;
+}
+
+/* Status Colors */
+.status-pending {
+    color: #f0ad4e;
+}
+
+.status-approved {
+    color: #5cb85c;
+}
+
+.status-declined {
+    color: #d9534f;
+}
+
+/* Application Actions */
+.approve-application,
+.decline-application {
+    margin-right: 5px;
+}
+
+.approve-application {
+    background: #5cb85c;
+    border-color: #4cae4c;
+    color: #fff;
+}
+
+.approve-application:hover {
+    background: #4cae4c;
+    border-color: #3d8b3d;
+    color: #fff;
+}
+
+.decline-application {
+    background: #d9534f;
+    border-color: #d43f3a;
+    color: #fff;
+}
+
+.decline-application:hover {
+    background: #d43f3a;
+    border-color: #ac2925;
+    color: #fff;
+}
+
+/* Table Styles */
+.wp-list-table .column-actions {
+    width: 200px;
+}
+
+.wp-list-table .button {
+    margin: 2px;
+}
+
+/* Responsive Styles */
+@media screen and (max-width: 782px) {
+    .wc-installment-details strong {
+        display: block;
+        width: auto;
+        margin-bottom: 5px;
+    }
+    
+    .wp-list-table .column-actions {
+        width: auto;
+    }
+    
+    .wp-list-table .button {
+        display: block;
+        width: 100%;
+        margin: 5px 0;
+        text-align: center;
+    }
+} 

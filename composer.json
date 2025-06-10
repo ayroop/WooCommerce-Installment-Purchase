@@ -1,0 +1,26 @@
+{
+    "name": "woocommerce/installment-purchase",
+    "description": "WooCommerce Installment Purchase Plugin",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "autoload": {
+        "psr-4": {
+            "WooCommerce\\InstallmentPurchase\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=7.4",
+        "composer/installers": "^2.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0",
+        "wp-coding-standards/wpcs": "^3.0",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+} 

@@ -1,0 +1,116 @@
+.wc-installment-purchase-options {
+    margin: 20px 0;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #f9f9f9;
+}
+
+.wc-installment-purchase-options h4 {
+    margin: 0 0 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.payment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.payment-options label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.payment-options label:hover {
+    border-color: #999;
+    background: #f5f5f5;
+}
+
+.payment-options input[type="radio"] {
+    margin-top: 3px;
+}
+
+.payment-options .price {
+    margin-left: auto;
+    font-weight: bold;
+}
+
+.installment-details {
+    margin-left: 25px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.installment-details p {
+    margin: 5px 0;
+}
+
+/* Application Form Styles */
+.wc-installment-application-form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.form-row {
+    margin-bottom: 20px;
+}
+
+.form-row label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.form-row input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.form-row input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+.form-row button {
+    width: 100%;
+    padding: 12px;
+    background: #2271b1;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.form-row button:hover {
+    background: #135e96;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .wc-installment-application-form {
+        padding: 15px;
+    }
+    
+    .payment-options label {
+        flex-direction: column;
+    }
+    
+    .payment-options .price {
+        margin-left: 0;
+        margin-top: 5px;
+    }
+} 

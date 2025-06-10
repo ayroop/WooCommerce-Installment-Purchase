@@ -1,0 +1,295 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce Installment Purchase\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/installment-purchase\n"
+"POT-Creation-Date: 2024-01-01 12:00:00+0000\n"
+"PO-Revision-Date: 2024-01-01 12:00:00+0000\n"
+"Last-Translator: Your Name <your.email@example.com>\n"
+"Language-Team: Persian <your.email@example.com>\n"
+"Language: fa_IR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.0\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: installment-purchase.php:123
+msgid "WooCommerce Installment Purchase requires WooCommerce to be installed and active."
+msgstr "افزونه خرید اقساطی ووکامرس نیاز به نصب و فعال بودن ووکامرس دارد."
+
+#: src/Frontend/Frontend.php:45
+msgid "Payment Method"
+msgstr "روش پرداخت"
+
+#: src/Frontend/Frontend.php:50
+msgid "Cash Payment"
+msgstr "پرداخت نقدی"
+
+#: src/Frontend/Frontend.php:55
+msgid "Installment Payment"
+msgstr "پرداخت اقساطی"
+
+#: src/Frontend/Frontend.php:57
+msgid "Down Payment: %s"
+msgstr "پیش پرداخت: %s"
+
+#: src/Frontend/Frontend.php:58
+msgid "Monthly Payment: %s x %d months"
+msgstr "پرداخت ماهانه: %s در %d ماه"
+
+#: src/Frontend/Frontend.php:59
+msgid "Service Fee: %s%%"
+msgstr "کارمزد: %s%%"
+
+#: src/Frontend/Frontend.php:89
+msgid "Please log in to apply for installment purchase."
+msgstr "لطفاً برای درخواست خرید اقساطی وارد حساب کاربری خود شوید."
+
+#: src/Frontend/Frontend.php:95
+msgid "Invalid product selected."
+msgstr "محصول نامعتبر انتخاب شده است."
+
+#: src/Frontend/Frontend.php:110
+msgid "First Name"
+msgstr "نام"
+
+#: src/Frontend/Frontend.php:115
+msgid "Last Name"
+msgstr "نام خانوادگی"
+
+#: src/Frontend/Frontend.php:120
+msgid "Bank Account Number"
+msgstr "شماره حساب بانکی"
+
+#: src/Frontend/Frontend.php:127
+msgid "I agree to the terms and conditions"
+msgstr "من با شرایط و ضوابط موافقم"
+
+#: src/Frontend/Frontend.php:132
+msgid "Submit Application"
+msgstr "ثبت درخواست"
+
+#: src/Gateway/Gateway.php:15
+msgid "Installment Purchase"
+msgstr "خرید اقساطی"
+
+#: src/Gateway/Gateway.php:16
+msgid "Enable customers to purchase products in installments"
+msgstr "امکان خرید اقساطی محصولات برای مشتریان"
+
+#: src/Gateway/Gateway.php:35
+msgid "Enable/Disable"
+msgstr "فعال/غیرفعال"
+
+#: src/Gateway/Gateway.php:37
+msgid "Enable Installment Purchase"
+msgstr "فعال کردن خرید اقساطی"
+
+#: src/Gateway/Gateway.php:42
+msgid "Title"
+msgstr "عنوان"
+
+#: src/Gateway/Gateway.php:44
+msgid "This controls the title which the user sees during checkout."
+msgstr "این عنوانی است که کاربر در صفحه تسویه حساب می‌بیند."
+
+#: src/Gateway/Gateway.php:49
+msgid "Description"
+msgstr "توضیحات"
+
+#: src/Gateway/Gateway.php:51
+msgid "This controls the description which the user sees during checkout."
+msgstr "این توضیحی است که کاربر در صفحه تسویه حساب می‌بیند."
+
+#: src/Gateway/Gateway.php:52
+msgid "Pay for your purchase in monthly installments."
+msgstr "خرید خود را به صورت اقساط ماهانه پرداخت کنید."
+
+#: src/Gateway/Gateway.php:56
+msgid "Minimum Down Payment (%)"
+msgstr "حداقل پیش پرداخت (%)"
+
+#: src/Gateway/Gateway.php:58
+msgid "Minimum down payment percentage required."
+msgstr "درصد حداقل پیش پرداخت مورد نیاز."
+
+#: src/Gateway/Gateway.php:63
+msgid "Service Fee (%)"
+msgstr "کارمزد (%)"
+
+#: src/Gateway/Gateway.php:65
+msgid "Service fee percentage applied to the remaining balance."
+msgstr "درصد کارمزد اعمال شده به مبلغ باقیمانده."
+
+#: src/Gateway/Gateway.php:70
+msgid "Maximum Months"
+msgstr "حداکثر ماه‌ها"
+
+#: src/Gateway/Gateway.php:72
+msgid "Maximum number of months for installment payments."
+msgstr "حداکثر تعداد ماه‌های پرداخت اقساط."
+
+#: src/Gateway/Gateway.php:77
+msgid "Inquiry Fee"
+msgstr "هزینه بررسی"
+
+#: src/Gateway/Gateway.php:79
+msgid "Fee for credit check inquiry."
+msgstr "هزینه بررسی اعتبار."
+
+#: src/Gateway/Gateway.php:120
+msgid "Awaiting down payment"
+msgstr "در انتظار پیش پرداخت"
+
+#: src/Gateway/Gateway.php:143
+msgid "Invalid request"
+msgstr "درخواست نامعتبر"
+
+#: src/Gateway/Gateway.php:144
+msgid "Payment Error"
+msgstr "خطای پرداخت"
+
+#: src/Admin/Admin.php:45
+msgid "Installment Applications"
+msgstr "درخواست‌های اقساطی"
+
+#: src/Admin/Admin.php:46
+msgid "Are you sure you want to approve this application?"
+msgstr "آیا از تایید این درخواست اطمینان دارید؟"
+
+#: src/Admin/Admin.php:47
+msgid "Are you sure you want to decline this application?"
+msgstr "آیا از رد این درخواست اطمینان دارید؟"
+
+#: src/Admin/Admin.php:48
+msgid "Processing..."
+msgstr "در حال پردازش..."
+
+#: src/Admin/Admin.php:89
+msgid "ID"
+msgstr "شناسه"
+
+#: src/Admin/Admin.php:90
+msgid "Customer"
+msgstr "مشتری"
+
+#: src/Admin/Admin.php:91
+msgid "Bank Account"
+msgstr "حساب بانکی"
+
+#: src/Admin/Admin.php:92
+msgid "Status"
+msgstr "وضعیت"
+
+#: src/Admin/Admin.php:93
+msgid "Date"
+msgstr "تاریخ"
+
+#: src/Admin/Admin.php:94
+msgid "Actions"
+msgstr "عملیات"
+
+#: src/Admin/Admin.php:102
+msgid "Unknown"
+msgstr "نامشخص"
+
+#: src/Admin/Admin.php:115
+msgid "Approve"
+msgstr "تایید"
+
+#: src/Admin/Admin.php:118
+msgid "Decline"
+msgstr "رد"
+
+#: src/Admin/Admin.php:121
+msgid "View Details"
+msgstr "مشاهده جزئیات"
+
+#: src/Admin/Admin.php:140
+msgid "Installment Details"
+msgstr "جزئیات اقساط"
+
+#: src/Admin/Admin.php:145
+msgid "Down Payment:"
+msgstr "پیش پرداخت:"
+
+#: src/Admin/Admin.php:150
+msgid "Remaining Balance:"
+msgstr "مبلغ باقیمانده:"
+
+#: src/Admin/Admin.php:155
+msgid "Monthly Payment:"
+msgstr "پرداخت ماهانه:"
+
+#: src/Admin/Admin.php:160
+msgid "Number of Months:"
+msgstr "تعداد ماه‌ها:"
+
+#: src/API/API.php:45
+msgid "Application not found"
+msgstr "درخواست یافت نشد"
+
+#: src/API/API.php:63
+msgid "Invalid status"
+msgstr "وضعیت نامعتبر"
+
+#: src/API/API.php:75
+msgid "Failed to update application status"
+msgstr "بروزرسانی وضعیت درخواست ناموفق بود"
+
+#: src/API/API.php:89
+msgid "Application status updated successfully"
+msgstr "وضعیت درخواست با موفقیت بروزرسانی شد"
+
+#: src/API/API.php:100
+msgid "You must be logged in to submit an application"
+msgstr "برای ثبت درخواست باید وارد حساب کاربری خود شوید"
+
+#: src/API/API.php:106
+msgid "Invalid product selected"
+msgstr "محصول نامعتبر انتخاب شده است"
+
+#: src/API/API.php:113
+msgid "Please fill in all required fields"
+msgstr "لطفاً تمام فیلدهای الزامی را پر کنید"
+
+#: src/API/API.php:134
+msgid "Failed to submit application"
+msgstr "ثبت درخواست ناموفق بود"
+
+#: src/API/API.php:143
+msgid "Application submitted successfully"
+msgstr "درخواست با موفقیت ثبت شد"
+
+#: src/API/API.php:157
+msgid "New Installment Application #%d"
+msgstr "درخواست اقساطی جدید #%d"
+
+#: src/API/API.php:159
+msgid "A new installment application has been submitted by %s %s."
+msgstr "یک درخواست اقساطی جدید توسط %s %s ثبت شده است."
+
+#: src/API/API.php:164
+msgid "Your Installment Application"
+msgstr "درخواست اقساطی شما"
+
+#: src/API/API.php:166
+msgid "Dear %s %s,<br><br>Your installment application has been received and is being reviewed. We will notify you once the review is complete."
+msgstr "جناب %s %s،<br><br>درخواست اقساطی شما دریافت شده و در حال بررسی است. پس از اتمام بررسی، به شما اطلاع داده خواهد شد."
+
+#: src/API/API.php:183
+msgid "Installment Application #%d Status Update"
+msgstr "بروزرسانی وضعیت درخواست اقساطی #%d"
+
+#: src/API/API.php:187
+msgid "Dear %s %s,<br><br>Your installment application has been approved. You can now proceed with the down payment."
+msgstr "جناب %s %s،<br><br>درخواست اقساطی شما تایید شده است. اکنون می‌توانید پیش پرداخت را انجام دهید."
+
+#: src/API/API.php:192
+msgid "Dear %s %s,<br><br>We regret to inform you that your installment application has been declined."
+msgstr "جناب %s %s،<br><br>متاسفانه باید به شما اطلاع دهیم که درخواست اقساطی شما رد شده است." 
