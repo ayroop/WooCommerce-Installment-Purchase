@@ -203,7 +203,7 @@ class Frontend {
     }
     
     public function ajax_calculate_installments() {
-        if ( ! defined( 'WOOCOMMERCE_CHECKOUT' ) || ! WC_AJAX || ! isset( $_POST['woocommerce_checkout_update_order_review'] ) ) {
+        if ( ! defined( 'WOOCOMMERCE_CHECKOUT' ) || ! \WC_AJAX || ! isset( $_POST['woocommerce_checkout_update_order_review'] ) ) {
             return;
         }
 
